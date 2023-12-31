@@ -20,7 +20,7 @@ public class TodoData : ITodoData
     public async Task<TodoModel?> GetOneAssigned(int assignedTo, int todoId)
     {
         var results = await _sql.LoadData<TodoModel, dynamic>(
-            "dbo.spTodos_GetAllAssigned",
+            "dbo.spTodos_GetOneAssigned",
             new { AssignedTo = assignedTo, TodoId = todoId },
             "Default");
         return results.FirstOrDefault();
