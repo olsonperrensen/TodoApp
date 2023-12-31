@@ -4,6 +4,7 @@ using System;
 using TodoLibrary.DataAccess;
 using TodoLibrary.Models;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using System.Threading.Tasks;
 
 namespace TodoAPI.Controllers;
 
@@ -33,7 +34,7 @@ public class TodosController : ControllerBase
     }
 
     // GET api/Todos/5
-    [HttpGet("{id}")]
+    [HttpGet("{todoId}")]
     public async Task<ActionResult<TodoModel>> Get(int todoId)
     {
         var output = await _data.GetOneAssigned(GetUserId(), todoId);
@@ -49,23 +50,29 @@ public class TodosController : ControllerBase
     }
     
     // PUT api/Todos/5
-    [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] string value)
+    [HttpPut("{todoId}")]
+    public async Task<IActionResult> Put(int todoId, [FromBody] string task)
     {
-        throw new NotImplementedException();
+        await _data.UpdateTask(GetUserId(),todoId,task);
+
+        return Ok();
     }
 
     // PUT api/Todos/5/Complete
-    [HttpPut("{id}/Complete")]
-    public IActionResult Complete(int id)
+    [HttpPut("{todoId}/Complete")]
+    public async Task<IActionResult> Complete(int todoId)
     {
-        throw new NotImplementedException();
+        await _data.CompleteTodo(todoId,GetUserId());
+
+        return Ok();
     }
 
     // DELETE api/Todos/5
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    [HttpDelete("{todoId}")]
+    public async Task<IActionResult> Delete(int todoId)
     {
-        throw new NotImplementedException();
+        await _data.Delete(todoId, GetUserId());
+
+        return Ok();
     }
 }

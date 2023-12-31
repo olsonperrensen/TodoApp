@@ -35,11 +35,11 @@ public class TodoData : ITodoData
         return results.FirstOrDefault();
     }
 
-    public Task UpdateTask(int todoId, int assignedTo, string task)
+    public Task UpdateTask(int assignedTo,int todoId, string task)
     {
         return _sql.SaveData<dynamic>(
-            "dbo.spTodos_GetAllAssigned",
-            new { AssignedTo = assignedTo, Task = task, TodoId = todoId }, "Default");
+            "dbo.spTodos_UpdateTask",
+            new { AssignedTo = assignedTo, TodoId = todoId, Task = task }, "Default");
     }
     public Task CompleteTodo(int todoId, int assignedTo)
     {
