@@ -30,13 +30,19 @@ public class TodosController : ControllerBase
 
     // GET: api/Todos
     [HttpGet]
-    public async Task<ActionResult<List<TodoModel>>> Get()
+    public async Task<ActionResult<List<TodoModel>>> Get(int page = 1, int pageSize = 10)
     {
         try
         {
             _logger.LogInformation("The GET call to api/Todos was called.");
-            var output = await _data.GetAllAssigned(GetUserId());
-            return Ok(output);
+            var productsTable = await _data.GetAllAssigned(GetUserId());
+            var totalCount = productsTable.Count();
+            var totalPages = (int)Math.Ceiling((decimal)totalCount / pageSize);
+            var productsPerPage = productsTable
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+            return Ok(productsPerPage);
         }
         catch (Exception e)
         {
