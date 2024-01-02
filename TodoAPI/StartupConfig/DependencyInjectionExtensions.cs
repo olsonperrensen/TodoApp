@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using TodoLibrary.DataAccess;
 
@@ -10,7 +12,37 @@ public static class DependencyInjectionExtensions
     public static void AddStandardServices(this WebApplicationBuilder builder) {
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.AddSwaggerServices();
+    }
+
+    private static void AddSwaggerServices(this WebApplicationBuilder builder)
+    {
+        builder.Services.AddSwaggerGen(opts =>
+        {
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            opts.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFile));
+            opts.AddSecurityDefinition("bearerAuth",
+                new OpenApiSecurityScheme() {
+                Name="Authorization",
+                Type=SecuritySchemeType.Http,
+                Description="Bearer token",
+                Scheme="bearer",
+                BearerFormat="JWT",
+                In=ParameterLocation.Header
+                });
+            opts.AddSecurityRequirement(new OpenApiSecurityRequirement() {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type=ReferenceType.SecurityScheme,
+                            Id="bearerAuth"
+                        }
+                    }, new List<string>()
+                },
+            });
+        });
     }
 
     public static void AddHealthCheckServices(this WebApplicationBuilder builder) {

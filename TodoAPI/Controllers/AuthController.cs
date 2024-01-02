@@ -22,7 +22,17 @@ public class AuthController : ControllerBase
 
     public record AuthenticationData(string? Username, string? Password);
     public record UserData(int Id,string FistName,string LastName, string UserName);
-
+    /// <summary>
+    /// Allows user to get a token by providing username and password
+    /// </summary>
+    /// <remarks>
+    /// Sample request: POST api/Auth/token 
+    /// Samples body: "username":"admin","password":"admin"
+    /// Sample Response: 200 OK (with token as JSON body)
+    /// </remarks>
+    /// <returns>A JWT token string.</returns>
+    /// <param name="data"></param>
+    /// 
     [HttpPost("token")]
     [AllowAnonymous]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
