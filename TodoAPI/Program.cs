@@ -12,7 +12,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(opts =>
+    {
+        opts.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoAPI v1");
+        opts.RoutePrefix = "";
+    });
 }
 
 app.UseHttpsRedirection();

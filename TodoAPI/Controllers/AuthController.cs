@@ -12,10 +12,12 @@ namespace TodoAPI.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IConfiguration _config;
+    private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IConfiguration config)
+    public AuthController(IConfiguration config, ILogger<AuthController> logger)
     {
         _config = config;
+        _logger = logger;
     }
 
     public record AuthenticationData(string? Username, string? Password);
@@ -25,14 +27,23 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public ActionResult<string> Authenticate([FromBody] AuthenticationData data)
     {
-        var user = ValidateCredentials(data);
-        if(user == null)
+        try
         {
-            return Unauthorized();
-        }
-        string token = GenerateToken(user);
+            _logger.LogInformation("POST api/Auth/token : Someone tried to token. Usr: {usr} Pwd: {pwd}",data.Username,data.Password);
+            var user = ValidateCredentials(data);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            string token = GenerateToken(user);
 
-        return Ok(token);
+            return Ok(token);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "POST api/Auth/token : Something went wrong. E:{e}",e);
+            return BadRequest("Token went wrong...");
+        }
     }
 
     private string GenerateToken(UserData user)
